@@ -1,16 +1,32 @@
+import argparse
+
+
 def main():
-    book_path = "books/frankenstein.txt"
-    text = get_book_text(book_path)
-    words = text.split()
-    word_count = get_word_count(words)
-    character_count = get_char_count(words)
-    frequency_list = create_char_frequency_list(character_count)
-    generate_report(book_path, word_count, frequency_list)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("book_path", help="This is the file path to your .txt file")
+    args = parser.parse_args()
+    text, error = get_book_text(args.book_path)
+    if error:
+        print(error)
+    elif text is not None:
+        words = text.split()
+        word_count = get_word_count(words)
+        character_count = get_char_count(words)
+        frequency_list = create_char_frequency_list(character_count)
+        generate_report(args.book_path, word_count, frequency_list)
 
 
 def get_book_text(path):
-    with open(path) as f:
-        return f.read()
+    try:
+        if path.endswith(".txt"):
+            with open(path) as f:
+                return f.read(), None
+        else:
+            raise TypeError
+    except FileNotFoundError:
+        return None, "File not found"
+    except TypeError:
+        return None, "File is not of text type"
 
 
 def get_word_count(words):
